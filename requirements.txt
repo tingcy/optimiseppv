@@ -6,3 +6,4 @@ streamlit==0.72.0
 scipy==1.4.1 
 xlrd==1.2.0
 plotly-express==0.4.1
+python-constrain==1.4.0
