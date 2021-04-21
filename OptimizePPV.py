@@ -102,7 +102,7 @@ df_min_max_scaled = df.copy()
 # apply normalization techniques by Column 1
 column = 'Score'
 df_min_max_scaled['Score'] = (df_min_max_scaled[column] - df_min_max_scaled[column].min()) / (df_min_max_scaled[column].max() - df_min_max_scaled[column].min()) * 100
-df_min_max_scaled['Score'] = df_min_max_scaled['Score'].round(decimals=0)
+df_min_max_scaled['Score'] = df_min_max_scaled['Score'].round(decimals=4)
 df_min_max_scaled = df_min_max_scaled.sort_values(by='Score', ascending=False)
 
 def highlight_optimized(s):
@@ -121,7 +121,12 @@ val_PPV4 = np.array2string(df_first_opt.iloc[0]['PPV_4'])
 val_PPV5 = np.array2string(df_first_opt.iloc[0]['PPV_5'])
 val_PPV6 = np.array2string(df_first_opt.iloc[0]['PPV_6'])
 
-st.write("This option says that we need " + val_PPV1 + " days for PPV 1 and " + val_PPV2 + " days for PPV 2. As for PPV 3, " + val_PPV3 + " days are needed and PPV 4 needs " + val_PPV4 + " days. As for PPV 5, we need " + val_PPV5 + " days while PPV 6 will need " + val_PPV6 + " days. With this combination, the vaccination will be completed in less or equal to " + str(dayToComplete) + " days.")
+st.subheader('Suggestion:') 
+st.markdown("#### Approach 1:")
+st.write("We need " + val_PPV1 + " days for PPV 1 and " + val_PPV2 + " days for PPV 2. As for PPV 3, " + val_PPV3 + " days are needed and PPV 4 needs " + val_PPV4 + " days. As for PPV 5, we need " + val_PPV5 + " days while PPV 6 will need " + val_PPV6 + " days. With this combination, the vaccination will be completed in less or equal to " + str(dayToComplete) + " days.")
+
+st.markdown("#### Approach 2:")
+st.write("We can complete all the doses in ONE day provided that we have " + val_PPV1 + " units of PPV 1, " + val_PPV2 + " units of PPV 2, "+ val_PPV3 + " units of PPV3, " + val_PPV4 + " of PPV4, " + val_PPV5 + " units of PPV5, and " + val_PPV6 + " units of PPV6.")
 
 st.subheader('Options with Descending Score:')
 st.write(df_min_max_scaled)
