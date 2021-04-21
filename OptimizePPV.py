@@ -38,7 +38,7 @@ st.sidebar.header('Weekly Dose Volume:')
 cntDose = st.sidebar.number_input('', min_value=1000, max_value=15000, value=3000)
 
 st.sidebar.header('Vaccination to be Completed in Days:')
-dayDose = st.sidebar.number_input('', min_value=1, max_value=7, value=6)
+dayToComplete = st.sidebar.number_input('', min_value=1, max_value=7, value=6)
 
 st.sidebar.header('Number of PPV Types in the District:')
 cnt_ppv1 = st.sidebar.number_input('PPV 1', min_value=0, value=5)
@@ -62,7 +62,7 @@ problem.addVariable('PPV_6', range(0,cnt_ppv6+1))
 # Define constraint function
 
 def vac_constraint(PPV_1, PPV_2, PPV_3, PPV_4, PPV_5, PPV_6):
-    if (PPV_1 + PPV_2 + PPV_3 + PPV_4 + PPV_5 + PPV_6 <= dayDose) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 > cntDose-400) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 < cntDose+200):
+    if (PPV_1 + PPV_2 + PPV_3 + PPV_4 + PPV_5 + PPV_6 <= dayToComplete) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 > cntDose-400) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 < cntDose+200):
         return True
 
 problem.addConstraint(vac_constraint, ['PPV_1', 'PPV_2', 'PPV_3', 'PPV_4', 'PPV_5', 'PPV_6'])
@@ -121,7 +121,7 @@ val_PPV4 = np.array2string(df_first_opt.iloc[0]['PPV_4'])
 val_PPV5 = np.array2string(df_first_opt.iloc[0]['PPV_5'])
 val_PPV6 = np.array2string(df_first_opt.iloc[0]['PPV_6'])
 
-st.write("This option says that we need " + val_PPV1 + " days for PPV 1 and " + val_PPV2 + " days for PPV 2. As for PPV 3, " + val_PPV3 + " days are needed and PPV 4 needs " + val_PPV4 + " days. As for PPV 5, we need " + val_PPV5 + " days while PPV 6 will need " + val_PPV6 + " days. With this combination, the vaccination will be completed in less or equal to 7 days.")
+st.write("This option says that we need " + val_PPV1 + " days for PPV 1 and " + val_PPV2 + " days for PPV 2. As for PPV 3, " + val_PPV3 + " days are needed and PPV 4 needs " + val_PPV4 + " days. As for PPV 5, we need " + val_PPV5 + " days while PPV 6 will need " + val_PPV6 + " days. With this combination, the vaccination will be completed in less or equal to " + str(dayToComplete) + " days.")
 
 st.subheader('Options with Descending Score:')
 st.write(df_min_max_scaled)
