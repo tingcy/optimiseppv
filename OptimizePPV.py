@@ -67,17 +67,24 @@ def vac_constraint(PPV_1, PPV_2, PPV_3, PPV_4, PPV_5, PPV_6):
 
 problem.addConstraint(vac_constraint, ['PPV_1', 'PPV_2', 'PPV_3', 'PPV_4', 'PPV_5', 'PPV_6'])
 
-solutions = problem.getSolutions() 
+try:
+    solutions = problem.getSolutions() 
 
-print("Number of solutions found: {}\n".format(len(solutions)))
+    print("Number of solutions found: {}\n".format(len(solutions)))
 
-for s in solutions:
-    print("PPV_1 = {}, PPV_2 = {}, PPV_3 = {}, PPV_4 = {}, PPV_5 = {}, PPV_6 = {}"
-        .format(s['PPV_1'], s['PPV_2'], s['PPV_3'], s['PPV_4'], s['PPV_5'], s['PPV_6']))
+    for s in solutions:
+        print("PPV_1 = {}, PPV_2 = {}, PPV_3 = {}, PPV_4 = {}, PPV_5 = {}, PPV_6 = {}"
+            .format(s['PPV_1'], s['PPV_2'], s['PPV_3'], s['PPV_4'], s['PPV_5'], s['PPV_6']))
 
-df = pd.DataFrame(solutions)
-df['Option'] = 'Option-' + df.index.astype(str)
-df = df[['Option','PPV_1', 'PPV_2', 'PPV_3', 'PPV_4', 'PPV_5', 'PPV_6']]
+    df = pd.DataFrame(solutions)
+    df['Option'] = 'Option-' + df.index.astype(str)
+    df = df[['Option','PPV_1', 'PPV_2', 'PPV_3', 'PPV_4', 'PPV_5', 'PPV_6']]
+     
+except:
+    st.error("Please make sure that you have chosen the correct numbers for the PPVs.")
+    st.stop()
+
+
 
 
 # Calculate the score of each options
