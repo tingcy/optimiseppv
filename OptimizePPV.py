@@ -1,17 +1,15 @@
 #############################################
 #
-#       Definition (PPV and pax)
+# PPV Definition
 #
-#Dewan Orang Ramai [10 cubes] = 240
-#Dewan Orang Ramai [15 cubes] = 360
-#Dewan Orang Ramai [20 cubes] = 480 
-#Balai Komuniti [5 cubes] = 120
-#Balai Komuniti [10 cubes] = 240 
-#Balai Komuniti [15 cubes] = 360
+# PPV 1 = 200
+# PPV 2 = 400
+# PPV 3 = 600
+# PPV 4 = 800
+# PPV 5 = 1000
+# PPV 6 = 1200
 #
 #############################################
-
-
 
 # Import libraries
 
@@ -20,69 +18,97 @@ import pandas as pd
 from random import randint
 import streamlit as st
 
-# Streamlit write-out
+# Streamlit configuration
 
 st.set_page_config(layout="wide")
-st.image('asm.png')
-st.header("Optimal PPV Combinations Calculation")
-st.write('Capacity of each PPV:') 
 
-PPV_capacity = {'PPV Type': ['Dewan Orang Ramai [10 cubes]', 'Dewan Orang Ramai [15 cubes]', 'Dewan Orang Ramai [20 cubes]', 'Balai Komuniti [5 cubes]', 'Balai Komuniti [10 cubes]', 'Balai Komuniti [15 cubes]'], 'Capacity': [240,360,480,120,240,360]}
+# Streamlit header and title
+
+st.image('asm.png')
+st.header("Optimal PPV Combinations Estimation")
+st.write('Daily Capacity Information for Each PPV:') 
+
+PPV_capacity = {'PPV Type': ['PPV 1', 'PPV 2', 'PPV 3', 'PPV 4', 'PPV 5', 'PPV 6'], 'Daily Capacity of PPV': [200,400,600,800,1000,1200]}
 st.write(pd.DataFrame.from_dict(PPV_capacity))
 
 # ------------ Sidebar components --------------
 
-st.sidebar.header('Optimization Parameters:')
-cntDose = st.sidebar.number_input('Weekly Dose Volume', min_value=1000, value=5000)
+st.sidebar.header('Weekly Dose Volume:')
+cntDose = st.sidebar.number_input('', min_value=1000, max_value=15000, value=3000)
 
-cost_DOR10 = st.sidebar.number_input('Daily Cost Dewan Orang Ramai [10 cubes]', min_value=0, value=200)
-cost_DOR15 = st.sidebar.number_input('Daily Cost Dewan Orang Ramai [15 cubes]', min_value=0, value=500)
-cost_DOR20 = st.sidebar.number_input('Daily Cost Dewan Orang Ramai [20 cubes]', min_value=0, value=800)
-cost_BK5 = st.sidebar.number_input('Daily Cost Balai Komuniti [5 cubes]', min_value=0, value=150)
-cost_BK10 = st.sidebar.number_input('Daily Cost Balai Komuniti [10 cubes]', min_value=0, value=250)
-cost_BK15 = st.sidebar.number_input('Daily Cost Balai Komuniti [15 cubes]', min_value=0, value=350)
+st.sidebar.header('Number of PPV Types in the District:')
+cnt_ppv1 = st.sidebar.number_input('PPV 1', min_value=0, value=5)
+cnt_ppv2 = st.sidebar.number_input('PPV 2', min_value=0, value=4)
+cnt_ppv3 = st.sidebar.number_input('PPV 3', min_value=0, value=5)
+cnt_ppv4 = st.sidebar.number_input('PPV 4', min_value=0, value=3)
+cnt_ppv5 = st.sidebar.number_input('PPV 5', min_value=0, value=4)
+cnt_ppv6 = st.sidebar.number_input('PPV 6', min_value=0, value=2)
 
 # Constraint definition
 
 problem = constraint.Problem()
 
-problem.addVariable('DOR_10', range(0,5))
-problem.addVariable('DOR_15', range(0,5)) 
-problem.addVariable('DOR_20', range(0,5)) 
-problem.addVariable('BK_5', range(0,20)) 
-problem.addVariable('BK_10', range(0,20))
-problem.addVariable('BK_15', range(0,20))
+problem.addVariable('PPV_1', range(0,cnt_ppv1+1))
+problem.addVariable('PPV_2', range(0,cnt_ppv2+1)) 
+problem.addVariable('PPV_3', range(0,cnt_ppv3+1)) 
+problem.addVariable('PPV_4', range(0,cnt_ppv4+1)) 
+problem.addVariable('PPV_5', range(0,cnt_ppv5+1)) 
+problem.addVariable('PPV_6', range(0,cnt_ppv6+1))
 
 # Define constraint function
 
-def vac_constraint(DOR_10, DOR_15, DOR_20, BK_5, BK_10, BK_15):
-    if (DOR_15 + DOR_20 > 3) and (DOR_10*240 + DOR_15*360 + DOR_20*480 + BK_5*120 + BK_10*240 + BK_15*360 > cntDose) and (DOR_10*240 + DOR_15*360 + DOR_20*480 + BK_5*120 + BK_10*240 + BK_15*360 < cntDose+200):
+def vac_constraint(PPV_1, PPV_2, PPV_3, PPV_4, PPV_5, PPV_6):
+    if (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 > cntDose-400) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 < cntDose+200):
         return True
 
-problem.addConstraint(vac_constraint, ['DOR_10', 'DOR_15', 'DOR_20', 'BK_5', 'BK_10', 'BK_15'])
+problem.addConstraint(vac_constraint, ['PPV_1', 'PPV_2', 'PPV_3', 'PPV_4', 'PPV_5', 'PPV_6'])
 
 solutions = problem.getSolutions() 
+
 print("Number of solutions found: {}\n".format(len(solutions)))
 
 for s in solutions:
-    print("DOR_10 = {}, DOR_15 = {}, DOR_20 = {},  BK_5 = {}, BK_10 = {}, BK_15 = {}"
-        .format(s['DOR_10'], s['DOR_15'], s['DOR_20'], s['BK_5'], s['BK_10'], s['BK_15']))
+    print("PPV_1 = {}, PPV_2 = {}, PPV_3 = {}, PPV_4 = {}, PPV_5 = {}, PPV_6 = {}"
+        .format(s['PPV_1'], s['PPV_2'], s['PPV_3'], s['PPV_4'], s['PPV_5'], s['PPV_6']))
 
 df = pd.DataFrame(solutions)
 df['Option'] = 'Option-' + df.index.astype(str)
-df = df[['Option','DOR_10', 'DOR_15', 'DOR_20', 'BK_5', 'BK_10', 'BK_15']]
+df = df[['Option','PPV_1', 'PPV_2', 'PPV_3', 'PPV_4', 'PPV_5', 'PPV_6']]
 
 
-# Calculate the cost of each options
-df['Total Cost'] = df['DOR_10'] * cost_DOR10 + df['DOR_15'] * cost_DOR15 + df['DOR_20'] * cost_DOR20 + df['BK_5'] * cost_BK5 + df['BK_10'] * cost_BK10 + df['BK_15'] * cost_BK15
-df = df.sort_values(by='Total Cost', ascending=True)
+# Calculate the score of each options
+
+st.sidebar.header('Preference of a PPV [score 0-10]:')
+w_ppv1  = st.sidebar.number_input('score for PPV 1', min_value=0, value=3)
+w_ppv2 = st.sidebar.number_input('score for PPV 2', min_value=0, value=3)
+w_ppv3 = st.sidebar.number_input('score for PPV 3', min_value=0, value=3)
+w_ppv4 = st.sidebar.number_input('score for PPV 4', min_value=0, value=2)
+w_ppv5 = st.sidebar.number_input('score for PPV 5', min_value=0, value=2)
+w_ppv6 = st.sidebar.number_input('score for PPV 6', min_value=0, value=1)
+
+def weight_calc(row):
+    return (w_ppv1*row['PPV_1'] + w_ppv2*row['PPV_2'] + w_ppv3*row['PPV_3'] + w_ppv4*row['PPV_4'] + w_ppv5*row['PPV_5'] + w_ppv6*row['PPV_6'])/(w_ppv1 + w_ppv2 + w_ppv3 + w_ppv4 + w_ppv5 + w_ppv6)
+
+df['Score'] = df.apply(lambda row : weight_calc(row), axis = 1)
+
+# Return Normalized Scores
+
+df_min_max_scaled = df.copy()
+  
+# apply normalization techniques by Column 1
+column = 'Score'
+df_min_max_scaled['Score'] = (df_min_max_scaled[column] - df_min_max_scaled[column].min()) / (df_min_max_scaled[column].max() - df_min_max_scaled[column].min()) * 100
+df_min_max_scaled['Score'] = df_min_max_scaled['Score'].round(decimals=0)
+df_min_max_scaled = df_min_max_scaled.sort_values(by='Score', ascending=False)
 
 def highlight_optimized(s):
     return 'background-color: yellow'  
  
-st.write('Optimization Results:')  
-st.dataframe(df.head(1).style.applymap(highlight_optimized))
+st.write('Top-3 Optimised Options:')  
 
-st.write('Options with Accendingly Total Cost:')
-st.write(df)
+df_first_opt =  df_min_max_scaled.head(3)
+st.dataframe(df_first_opt.style.applymap(highlight_optimized))
+
+st.write('Options with Descending Score:')
+st.write(df_min_max_scaled)
 
