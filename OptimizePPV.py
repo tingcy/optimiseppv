@@ -34,19 +34,19 @@ st.write(pd.DataFrame.from_dict(PPV_capacity))
 
 # ------------ Sidebar components --------------
 
-st.sidebar.header('Weekly Dose Volume:')
-cntDose = st.sidebar.number_input('', min_value=1000, max_value=15000, value=3000)
+st.sidebar.header('Dose:')
+cntDose = st.sidebar.number_input('', min_value=1000, max_value=15000, value=5000)
 
-st.sidebar.header('Vaccination to be Completed in Days:')
-dayToComplete = st.sidebar.number_input('', min_value=1, max_value=7, value=6)
+st.sidebar.header('Days to Completion:')
+dayToComplete = st.sidebar.number_input('', min_value=1, max_value=5, value=5)
 
-st.sidebar.header('Number of PPV Types in the District:')
+st.sidebar.header('Number of PPV Types:')
 cnt_ppv1 = st.sidebar.number_input('PPV 1', min_value=0, value=5)
-cnt_ppv2 = st.sidebar.number_input('PPV 2', min_value=0, value=4)
+cnt_ppv2 = st.sidebar.number_input('PPV 2', min_value=0, value=5)
 cnt_ppv3 = st.sidebar.number_input('PPV 3', min_value=0, value=5)
-cnt_ppv4 = st.sidebar.number_input('PPV 4', min_value=0, value=3)
-cnt_ppv5 = st.sidebar.number_input('PPV 5', min_value=0, value=4)
-cnt_ppv6 = st.sidebar.number_input('PPV 6', min_value=0, value=2)
+cnt_ppv4 = st.sidebar.number_input('PPV 4', min_value=0, value=5)
+cnt_ppv5 = st.sidebar.number_input('PPV 5', min_value=0, value=5)
+cnt_ppv6 = st.sidebar.number_input('PPV 6', min_value=0, value=5)
 
 # Constraint definition
 
@@ -62,7 +62,8 @@ problem.addVariable('PPV_6', range(0,cnt_ppv6+1))
 # Define constraint function
 
 def vac_constraint(PPV_1, PPV_2, PPV_3, PPV_4, PPV_5, PPV_6):
-    if (PPV_1 + PPV_2 + PPV_3 + PPV_4 + PPV_5 + PPV_6 <= dayToComplete) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 > cntDose-400) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 < cntDose+200):
+    #if (PPV_1 + PPV_2 + PPV_3 + PPV_4 + PPV_5 + PPV_6 <= dayToComplete) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 > cntDose-400) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200 < cntDose+200):
+    if (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200) > (cntDose/dayToComplete - cntDose/dayToComplete*0.1) and (PPV_1*200 + PPV_2*400 + PPV_3*600 + PPV_4*800 + PPV_5*1000 + PPV_6*1200) < (cntDose/dayToComplete + cntDose/dayToComplete*0.1):        
         return True
 
 problem.addConstraint(vac_constraint, ['PPV_1', 'PPV_2', 'PPV_3', 'PPV_4', 'PPV_5', 'PPV_6'])
@@ -128,13 +129,15 @@ val_PPV4 = np.array2string(df_first_opt.iloc[0]['PPV_4'])
 val_PPV5 = np.array2string(df_first_opt.iloc[0]['PPV_5'])
 val_PPV6 = np.array2string(df_first_opt.iloc[0]['PPV_6'])
 
-st.subheader('Suggestion:') 
-st.markdown("#### Approach 1:")
-st.write("We need " + val_PPV1 + " days for PPV 1 and " + val_PPV2 + " days for PPV 2. As for PPV 3, " + val_PPV3 + " days are needed and PPV 4 needs " + val_PPV4 + " days. As for PPV 5, we need " + val_PPV5 + " days while PPV 6 will need " + val_PPV6 + " days. With this combination, the vaccination will be completed in less or equal to " + str(dayToComplete) + " days.")
+st.subheader('Findings:') 
+# st.markdown("#### Approach 1:")
+# st.write("We need " + val_PPV1 + " days for PPV 1 and " + val_PPV2 + " days for PPV 2. As for PPV 3, " + val_PPV3 + " days are needed and PPV 4 needs " + val_PPV4 + " days. As for PPV 5, we need " + val_PPV5 + " days while PPV 6 will need " + val_PPV6 + " days. With this combination, the vaccination will be completed in less or equal to " + str(dayToComplete) + " days.")
 
-st.markdown("#### Approach 2:")
-st.write("We can complete all the doses in ONE day provided that we have " + val_PPV1 + " units of PPV 1, " + val_PPV2 + " units of PPV 2, "+ val_PPV3 + " units of PPV3, " + val_PPV4 + " of PPV4, " + val_PPV5 + " units of PPV5, and " + val_PPV6 + " units of PPV6.")
+# st.markdown("#### Approach 2:")
+# st.write("We can complete all the doses in ONE day provided that we have " + val_PPV1 + " units of PPV 1, " + val_PPV2 + " units of PPV 2, "+ val_PPV3 + " units of PPV3, " + val_PPV4 + " of PPV4, " + val_PPV5 + " units of PPV5, and " + val_PPV6 + " units of PPV6.")
+
+st.write("We have a total of " + str(cntDose) + " dose. " + "To complete all the dose, since we have " + str(cnt_ppv1) + " PPV Type 1, we need " + val_PPV1 + " days. We have " + str(cnt_ppv2) + " PPV Type 2 and therefore " + val_PPV2 + " days for PPV Type 2 are needed. There are " + str(cnt_ppv3) + " PPV Type 3 and we need " + val_PPV3 + " days. As for PPV Type 4, we have " + str(cnt_ppv4) + " and " + val_PPV4 + " days are needed. We have " + str(cnt_ppv5) + " PPV Type 5, we need " + val_PPV5 + " days. Last, we have " + str(cnt_ppv6) + " PPV Type 6, then the required days are " + val_PPV6 + "." )
 
 st.subheader('Options with Descending Score:')
 st.write(df_min_max_scaled)
-
+ 
